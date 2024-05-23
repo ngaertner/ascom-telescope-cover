@@ -30,6 +30,7 @@ namespace ASCOM.DarkSkyGeek
             // Update the state variables with results from the dialogue
             Switch.autoDetectComPort = chkAutoDetect.Checked;
             Switch.comPortOverride = (string)comboBoxComPort.SelectedItem;
+            Switch.comPort2Override = (string)comboBoxComPort2.SelectedItem;
             tl.Enabled = chkTrace.Checked;
         }
 
@@ -69,11 +70,33 @@ namespace ASCOM.DarkSkyGeek
             {
                 comboBoxComPort.SelectedItem = Switch.comPortOverride;
             }
+
+            
+            // Use System.IO because it's static
+            comboBoxComPort2.Items.Clear();
+            comboBoxComPort2.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());
+            comboBoxComPort2.Items.Insert(0, "");
+            if (comboBoxComPort2.Items.Contains(Switch.comPort2Override))
+            {
+                comboBoxComPort2.SelectedItem = Switch.comPort2Override;
+            }
+            
+
         }
 
         private void chkAutoDetect_CheckedChanged(object sender, EventArgs e)
         {
             comboBoxComPort.Enabled = !((CheckBox)sender).Checked;
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SetupDialogForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

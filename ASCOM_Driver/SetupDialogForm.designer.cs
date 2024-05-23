@@ -35,6 +35,8 @@ namespace ASCOM.DarkSkyGeek
             this.comboBoxComPort = new System.Windows.Forms.ComboBox();
             this.picASCOM = new System.Windows.Forms.PictureBox();
             this.chkAutoDetect = new System.Windows.Forms.CheckBox();
+            this.comboBoxComPort2 = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.SuspendLayout();
             // 
@@ -44,7 +46,7 @@ namespace ASCOM.DarkSkyGeek
             this.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.cmdOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmdOK.Image = global::ASCOM.DarkSkyGeek.Properties.Resources.icon_ok_24;
-            this.cmdOK.Location = new System.Drawing.Point(177, 94);
+            this.cmdOK.Location = new System.Drawing.Point(177, 176);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
             this.cmdOK.Size = new System.Drawing.Size(76, 35);
@@ -58,7 +60,7 @@ namespace ASCOM.DarkSkyGeek
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cmdCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmdCancel.Image = global::ASCOM.DarkSkyGeek.Properties.Resources.icon_cancel_24;
-            this.cmdCancel.Location = new System.Drawing.Point(259, 94);
+            this.cmdCancel.Location = new System.Drawing.Point(259, 176);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(74, 37);
             this.cmdCancel.TabIndex = 1;
@@ -72,15 +74,15 @@ namespace ASCOM.DarkSkyGeek
             this.comPortOverrideLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comPortOverrideLabel.Location = new System.Drawing.Point(153, 38);
             this.comPortOverrideLabel.Name = "comPortOverrideLabel";
-            this.comPortOverrideLabel.Size = new System.Drawing.Size(99, 13);
+            this.comPortOverrideLabel.Size = new System.Drawing.Size(65, 13);
             this.comPortOverrideLabel.TabIndex = 5;
-            this.comPortOverrideLabel.Text = "COM Port Override:";
+            this.comPortOverrideLabel.Text = "COM Port 1;";
             // 
             // chkTrace
             // 
             this.chkTrace.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.chkTrace.AutoSize = true;
-            this.chkTrace.Location = new System.Drawing.Point(268, 62);
+            this.chkTrace.Location = new System.Drawing.Point(264, 112);
             this.chkTrace.Name = "chkTrace";
             this.chkTrace.Size = new System.Drawing.Size(69, 17);
             this.chkTrace.TabIndex = 6;
@@ -124,14 +126,37 @@ namespace ASCOM.DarkSkyGeek
             this.chkAutoDetect.UseVisualStyleBackColor = true;
             this.chkAutoDetect.CheckedChanged += new System.EventHandler(this.chkAutoDetect_CheckedChanged);
             // 
+            // comboBoxComPort2
+            // 
+            this.comboBoxComPort2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBoxComPort2.FormattingEnabled = true;
+            this.comboBoxComPort2.Location = new System.Drawing.Point(258, 62);
+            this.comboBoxComPort2.Name = "comboBoxComPort2";
+            this.comboBoxComPort2.Size = new System.Drawing.Size(71, 21);
+            this.comboBoxComPort2.TabIndex = 7;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(153, 62);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(65, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "COM Port 2:";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(345, 139);
+            this.ClientSize = new System.Drawing.Size(345, 221);
             this.Controls.Add(this.chkAutoDetect);
+            this.Controls.Add(this.comboBoxComPort2);
             this.Controls.Add(this.comboBoxComPort);
             this.Controls.Add(this.chkTrace);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.comPortOverrideLabel);
             this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.cmdCancel);
@@ -143,6 +168,7 @@ namespace ASCOM.DarkSkyGeek
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DarkSkyGeek’s Telescope Cover";
+            this.Load += new System.EventHandler(this.SetupDialogForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -158,5 +184,7 @@ namespace ASCOM.DarkSkyGeek
         private System.Windows.Forms.ComboBox comboBoxComPort;
         private System.Windows.Forms.PictureBox picASCOM;
         private System.Windows.Forms.CheckBox chkAutoDetect;
+        private System.Windows.Forms.ComboBox comboBoxComPort2;
+        private System.Windows.Forms.Label label1;
     }
 }
