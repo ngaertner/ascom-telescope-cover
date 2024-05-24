@@ -9,9 +9,11 @@ using ASCOM.Utilities;
 
 using System;
 using System.Collections;
+using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace ASCOM.DarkSkyGeek
 {
@@ -46,8 +48,12 @@ namespace ASCOM.DarkSkyGeek
         internal static string autoDetectComPortDefault = "true";
         internal static string comPortProfileName = "COM Port";
         internal static string comPort2ProfileName = "COM Port 2";
+        internal static string comPortNameProfileName = "COM Port Name";
+        internal static string comPort2NameProfileName = "COM Port 2 Name";
         internal static string comPortDefault = "COM1";
         internal static string comPort2Default = "";
+        internal static string comPortNameDefault = "Cover 1";
+        internal static string comPort2NameDefault = "Cover 2";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
 
@@ -55,6 +61,8 @@ namespace ASCOM.DarkSkyGeek
         internal static bool autoDetectComPort = Convert.ToBoolean(autoDetectComPortDefault);
         internal static string comPortOverride = comPortDefault;
         internal static string comPort2Override = comPort2Default;
+        internal static string comPortName = comPortNameDefault;
+        internal static string comPort2Name = comPort2NameDefault;
 
         /// <summary>
         /// Private variable to hold the connected state
@@ -228,12 +236,6 @@ namespace ASCOM.DarkSkyGeek
                         throw new InvalidValueException("Invalid COM port", comPort.ToString(), String.Join(", ", System.IO.Ports.SerialPort.GetPortNames()));
                     }
 
-                    if (comPort2 != null) {
-                        if (!System.IO.Ports.SerialPort.GetPortNames().Contains(comPort2))
-                        {
-                            throw new InvalidValueException("Invalid COM port", comPort2.ToString(), String.Join(", ", System.IO.Ports.SerialPort.GetPortNames()));
-                        }
-                    }
 
                     LogMessage("Connected Set", "Connecting to port {0}", comPort);
 
@@ -271,11 +273,9 @@ namespace ASCOM.DarkSkyGeek
                         {
                             success = true;
                             numSwitch += 1;
-                            //                            break;
+                            break;
                         }
                     }
-
-
 
                     /*
                      * #######################################
@@ -289,9 +289,16 @@ namespace ASCOM.DarkSkyGeek
                     }
 
 
+
                     if (comPort2 != null && comPort2 != comPort2Default)
                     {
-                        System.Windows.Forms.MessageBox.Show(comPort2);
+
+
+                        if (!System.IO.Ports.SerialPort.GetPortNames().Contains(comPort2))
+                        {
+                            throw new InvalidValueException("Invalid COM port", comPort2.ToString(), String.Join(", ", System.IO.Ports.SerialPort.GetPortNames()));
+                        }
+
 
                         LogMessage("Connected Set", "Connecting to port {0}", comPort);
 
@@ -317,7 +324,7 @@ namespace ASCOM.DarkSkyGeek
                             try
                             {
                                 objSerial2.Transmit(COMMAND_PING + SEPARATOR);
-                                response = objSerial.ReceiveTerminated(SEPARATOR).Trim();
+                                response = objSerial2.ReceiveTerminated(SEPARATOR).Trim();
                             }
                             catch (Exception)
                             {
@@ -328,11 +335,13 @@ namespace ASCOM.DarkSkyGeek
                             {
                                 success = true;
                                 numSwitch += 1;
+                                break;
                             }
                         }
 
 
                     }
+
 
                     if (!success)
                     {
@@ -474,23 +483,28 @@ namespace ASCOM.DarkSkyGeek
             Validate("GetSwitchName", id);
             tl.LogMessage("GetSwitchName", $"GetSwitchName({id})");
 
-            if (id == 1)
+            if (id == 0)
             {
-                return deviceName;
+                return comPortName;
+
+            }
+            else if (id == 1)
+            {
+                return comPort2Name;
             }
             else
             {
-                return $"{deviceName} {id+1}";
-            }            
+                return $"{deviceName} {id + 1}";
+            }
 
         }
 
-        /// <summary>
-        /// Sets a switch name to a specified value
-        /// </summary>
-        /// <param name="id">The number of the switch whose name is to be set</param>
-        /// <param name="name">The name of the switch</param>
-        public void SetSwitchName(short id, string name)
+    /// <summary>
+    /// Sets a switch name to a specified value
+    /// </summary>
+    /// <param name="id">The number of the switch whose name is to be set</param>
+    /// <param name="name">The name of the switch</param>
+    public void SetSwitchName(short id, string name)
         {
             Validate("SetSwitchName", id);
             tl.LogMessage("SetSwitchName", $"SetSwitchName({id}) = {name} - not implemented");
@@ -801,6 +815,8 @@ namespace ASCOM.DarkSkyGeek
                 autoDetectComPort = Convert.ToBoolean(driverProfile.GetValue(driverID, autoDetectComPortProfileName, string.Empty, autoDetectComPortDefault));
                 comPortOverride = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
                 comPort2Override = driverProfile.GetValue(driverID, comPort2ProfileName, string.Empty, comPort2Default);
+                comPortName = driverProfile.GetValue(driverID, comPortNameProfileName, string.Empty, comPortNameDefault);
+                comPort2Name = driverProfile.GetValue(driverID, comPort2NameProfileName, string.Empty, comPort2NameDefault);
             }
         }
 
@@ -814,6 +830,9 @@ namespace ASCOM.DarkSkyGeek
                 driverProfile.DeviceType = "Switch";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
                 driverProfile.WriteValue(driverID, autoDetectComPortProfileName, autoDetectComPort.ToString());
+                driverProfile.WriteValue(driverID, comPortNameProfileName, comPortName);
+                driverProfile.WriteValue(driverID, comPort2NameProfileName, comPort2Name);
+
                 if (comPortOverride != null)
                 {
                     driverProfile.WriteValue(driverID, comPortProfileName, comPortOverride.ToString());
@@ -904,6 +923,7 @@ namespace ASCOM.DarkSkyGeek
         /// </summary>
         private bool QueryDeviceState(short id)
         {
+
             tl.LogMessage("QueryDeviceState", "Sending request to device...");
             if (id == 0)
             {
@@ -911,6 +931,7 @@ namespace ASCOM.DarkSkyGeek
             }
             else if (id == 1)
             {
+
                 objSerial2.Transmit(COMMAND_GETSTATE + SEPARATOR);
             }
 
@@ -918,7 +939,20 @@ namespace ASCOM.DarkSkyGeek
             string response;
             try
             {
-                response = objSerial.ReceiveTerminated(SEPARATOR).Trim();
+                if (id == 0)
+                {
+                    response = objSerial.ReceiveTerminated(SEPARATOR).Trim();
+                }
+                else if (id == 1)
+                {
+                    response = objSerial2.ReceiveTerminated(SEPARATOR).Trim();
+                }
+                else
+                {
+                    response = "";
+                }
+
+
             }
             catch (Exception e)
             {

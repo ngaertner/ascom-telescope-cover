@@ -31,6 +31,8 @@ namespace ASCOM.DarkSkyGeek
             Switch.autoDetectComPort = chkAutoDetect.Checked;
             Switch.comPortOverride = (string)comboBoxComPort.SelectedItem;
             Switch.comPort2Override = (string)comboBoxComPort2.SelectedItem;
+            Switch.comPortName = textBoxComPortName.Text;
+            Switch.comPort2Name = textBoxComPort2Name.Text;
             tl.Enabled = chkTrace.Checked;
         }
 
@@ -61,6 +63,9 @@ namespace ASCOM.DarkSkyGeek
             chkAutoDetect.Checked = Switch.autoDetectComPort;
             chkTrace.Checked = tl.Enabled;
             comboBoxComPort.Enabled = !chkAutoDetect.Checked;
+            textBoxComPortName.Text = Switch.comPortName;
+            textBoxComPort2Name.Text = Switch.comPort2Name;
+
             // Set the list of COM ports to those that are currently available
             comboBoxComPort.Items.Clear();
             // Use System.IO because it's static
@@ -95,6 +100,11 @@ namespace ASCOM.DarkSkyGeek
         }
 
         private void SetupDialogForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
         {
 
         }
