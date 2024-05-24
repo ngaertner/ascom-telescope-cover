@@ -1,5 +1,17 @@
 # ASCOM-Compatible Telescope Cover
 
+## NOTE - Changed Forked Version
+
+This is a forked version of the great (and now readonly) ASCOM telescope cover repository by @jlecomte !
+
+I did some changes to the code to allow the control of two telescope covers at the same time (e.g. for an additional guide scope).
+To avoid confusion, it is now also possible to set a display name for each cover.
+
+Currently this is just a quick hack - if time permits I will create a new ASCOM driver for it with more flexibility and customiziation options.
+
+
+## Original Readme from @jlecomte
+
 I do not charge anything to create and maintain these open-source projects. But if you would like to say "thanks" for this project, feel free to send any amount through Paypal using the button below. I appreciate your support!
 
 [![](images/donate.png)](https://www.paypal.com/donate/?hosted_button_id=49UXY8F6VVYFA)
