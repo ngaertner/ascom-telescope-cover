@@ -31,8 +31,10 @@ namespace ASCOM.DarkSkyGeek
             Switch.autoDetectComPort = chkAutoDetect.Checked;
             Switch.comPortOverride = (string)comboBoxComPort.SelectedItem;
             Switch.comPort2Override = (string)comboBoxComPort2.SelectedItem;
+            Switch.comPort3Override = (string)comboBoxComPort3.SelectedItem;
             Switch.comPortName = textBoxComPortName.Text;
             Switch.comPort2Name = textBoxComPort2Name.Text;
+            Switch.comPort3Name = textBoxComPort3Name.Text;
             tl.Enabled = chkTrace.Checked;
         }
 
@@ -65,6 +67,7 @@ namespace ASCOM.DarkSkyGeek
             comboBoxComPort.Enabled = !chkAutoDetect.Checked;
             textBoxComPortName.Text = Switch.comPortName;
             textBoxComPort2Name.Text = Switch.comPort2Name;
+            textBoxComPort3Name.Text = Switch.comPort3Name;
 
             // Set the list of COM ports to those that are currently available
             comboBoxComPort.Items.Clear();
@@ -85,7 +88,15 @@ namespace ASCOM.DarkSkyGeek
             {
                 comboBoxComPort2.SelectedItem = Switch.comPort2Override;
             }
-            
+
+            comboBoxComPort3.Items.Clear();
+            comboBoxComPort3.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());
+            comboBoxComPort3.Items.Insert(0, "");
+            if (comboBoxComPort3.Items.Contains(Switch.comPort3Override))
+            {
+                comboBoxComPort3.SelectedItem = Switch.comPort3Override;
+            }
+
 
         }
 

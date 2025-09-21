@@ -48,12 +48,16 @@ namespace ASCOM.DarkSkyGeek
         internal static string autoDetectComPortDefault = "true";
         internal static string comPortProfileName = "COM Port";
         internal static string comPort2ProfileName = "COM Port 2";
+        internal static string comPort3ProfileName = "COM Port 3";
         internal static string comPortNameProfileName = "COM Port Name";
         internal static string comPort2NameProfileName = "COM Port 2 Name";
+        internal static string comPort3NameProfileName = "COM Port 3 Name";
         internal static string comPortDefault = "COM1";
         internal static string comPort2Default = "";
+        internal static string comPort3Default = "";
         internal static string comPortNameDefault = "Cover 1";
         internal static string comPort2NameDefault = "Cover 2";
+        internal static string comPort3NameDefault = "Cover 3";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
 
@@ -61,8 +65,10 @@ namespace ASCOM.DarkSkyGeek
         internal static bool autoDetectComPort = Convert.ToBoolean(autoDetectComPortDefault);
         internal static string comPortOverride = comPortDefault;
         internal static string comPort2Override = comPort2Default;
+        internal static string comPort3Override = comPort3Default;
         internal static string comPortName = comPortNameDefault;
         internal static string comPort2Name = comPort2NameDefault;
+        internal static string comPort3Name = comPort3NameDefault;
 
         /// <summary>
         /// Private variable to hold the connected state
@@ -74,6 +80,7 @@ namespace ASCOM.DarkSkyGeek
         /// </summary>
         private string comPort;
         private string comPort2;
+        private string comPort3;
 
         /// <summary>
         /// Variable to hold the trace logger object (creates a diagnostic log file with information that you specify)
@@ -83,6 +90,7 @@ namespace ASCOM.DarkSkyGeek
         // The object used to communicate with the device using serial port communication.
         private Serial objSerial;
         private Serial objSerial2;
+        private Serial objSerial3;
 
         // Constants used to communicate with the device
         // Make sure those values are identical to those in the Arduino Firmware.
@@ -287,6 +295,10 @@ namespace ASCOM.DarkSkyGeek
                     {
                         comPort2 = comPort2Override;
                     }
+                    if (comPort3 == null)
+                    {
+                        comPort3 = comPort3Override;
+                    }
 
 
 
@@ -342,6 +354,57 @@ namespace ASCOM.DarkSkyGeek
 
                     }
 
+                    if (comPort3 != null && comPort3 != comPort3Default)
+                    {
+
+
+                        if (!System.IO.Ports.SerialPort.GetPortNames().Contains(comPort3))
+                        {
+                            throw new InvalidValueException("Invalid COM port", comPort3.ToString(), String.Join(", ", System.IO.Ports.SerialPort.GetPortNames()));
+                        }
+
+
+                        LogMessage("Connected Set", "Connecting to port {0}", comPort);
+
+                        objSerial3 = new Serial
+                        {
+                            Speed = SerialSpeed.ps57600,
+                            PortName = comPort3,
+                            Connected = true
+                        };
+
+                        // Wait a second for the serial connection to establish
+                        System.Threading.Thread.Sleep(1000);
+
+                        objSerial3.ClearBuffers();
+
+                        // Poll the device (with a short timeout value) until successful,
+                        // or until we've reached the retry count limit of 3...
+                        objSerial3.ReceiveTimeout = 1;
+                        success = false;
+                        for (int retries = 3; retries >= 0; retries--)
+                        {
+                            string response = "";
+                            try
+                            {
+                                objSerial3.Transmit(COMMAND_PING + SEPARATOR);
+                                response = objSerial3.ReceiveTerminated(SEPARATOR).Trim();
+                            }
+                            catch (Exception)
+                            {
+                                // PortInUse or Timeout exceptions may happen here!
+                                // We ignore them.
+                            }
+                            if (response == RESULT_PING + DEVICE_GUID)
+                            {
+                                success = true;
+                                numSwitch += 1;
+                                break;
+                            }
+                        }
+
+
+                    }
 
                     if (!success)
                     {
@@ -366,6 +429,18 @@ namespace ASCOM.DarkSkyGeek
                             objSerial2.Connected = false;
                             objSerial2.Dispose();
                             objSerial2 = null;
+
+
+                        }
+
+                        if (objSerial3 != null)
+                        {
+                            // Restore default timeout value...
+                            objSerial3.ReceiveTimeout = 10;
+
+                            objSerial3.Connected = false;
+                            objSerial3.Dispose();
+                            objSerial3 = null;
 
 
                         }
@@ -397,6 +472,16 @@ namespace ASCOM.DarkSkyGeek
                         objSerial2.Connected = false;
                         objSerial2.Dispose();
                         objSerial2 = null;
+                    }
+
+
+                    if (objSerial3 != null)
+                    {
+                        LogMessage("Connected Set", "Disconnecting from port {0}", comPort3);
+
+                        objSerial3.Connected = false;
+                        objSerial3.Dispose();
+                        objSerial3 = null;
                     }
 
                 }
@@ -491,6 +576,10 @@ namespace ASCOM.DarkSkyGeek
             else if (id == 1)
             {
                 return comPort2Name;
+            }
+            else if (id == 2)
+            {
+                return comPort3Name;
             }
             else
             {
@@ -815,8 +904,10 @@ namespace ASCOM.DarkSkyGeek
                 autoDetectComPort = Convert.ToBoolean(driverProfile.GetValue(driverID, autoDetectComPortProfileName, string.Empty, autoDetectComPortDefault));
                 comPortOverride = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
                 comPort2Override = driverProfile.GetValue(driverID, comPort2ProfileName, string.Empty, comPort2Default);
+                comPort3Override = driverProfile.GetValue(driverID, comPort3ProfileName, string.Empty, comPort3Default);
                 comPortName = driverProfile.GetValue(driverID, comPortNameProfileName, string.Empty, comPortNameDefault);
                 comPort2Name = driverProfile.GetValue(driverID, comPort2NameProfileName, string.Empty, comPort2NameDefault);
+                comPort3Name = driverProfile.GetValue(driverID, comPort3NameProfileName, string.Empty, comPort3NameDefault);
             }
         }
 
@@ -832,6 +923,7 @@ namespace ASCOM.DarkSkyGeek
                 driverProfile.WriteValue(driverID, autoDetectComPortProfileName, autoDetectComPort.ToString());
                 driverProfile.WriteValue(driverID, comPortNameProfileName, comPortName);
                 driverProfile.WriteValue(driverID, comPort2NameProfileName, comPort2Name);
+                driverProfile.WriteValue(driverID, comPort3NameProfileName, comPort3Name);
 
                 if (comPortOverride != null)
                 {
@@ -840,6 +932,10 @@ namespace ASCOM.DarkSkyGeek
                 if (comPort2Override != null)
                 {
                     driverProfile.WriteValue(driverID, comPort2ProfileName, comPort2Override.ToString());
+                }
+                if (comPort3Override != null)
+                {
+                    driverProfile.WriteValue(driverID, comPort3ProfileName, comPort3Override.ToString());
                 }
             }
         }
@@ -934,6 +1030,11 @@ namespace ASCOM.DarkSkyGeek
 
                 objSerial2.Transmit(COMMAND_GETSTATE + SEPARATOR);
             }
+            else if (id == 2)
+            {
+
+                objSerial3.Transmit(COMMAND_GETSTATE + SEPARATOR);
+            }
 
             tl.LogMessage("QueryDeviceState", "Waiting for response from device...");
             string response;
@@ -946,6 +1047,10 @@ namespace ASCOM.DarkSkyGeek
                 else if (id == 1)
                 {
                     response = objSerial2.ReceiveTerminated(SEPARATOR).Trim();
+                }
+                else if (id == 2)
+                {
+                    response = objSerial3.ReceiveTerminated(SEPARATOR).Trim();
                 }
                 else
                 {
@@ -982,6 +1087,10 @@ namespace ASCOM.DarkSkyGeek
             {
                 objSerial2.Transmit(COMMAND_OPEN + SEPARATOR);
             }
+            else if (id == 2)
+            {
+                objSerial3.Transmit(COMMAND_OPEN + SEPARATOR);
+            }
 
             tl.LogMessage("OpenCover", "Request sent to device!");
         }
@@ -999,6 +1108,10 @@ namespace ASCOM.DarkSkyGeek
             else if (id == 1)
             {
                 objSerial2.Transmit(COMMAND_CLOSE + SEPARATOR);
+            }
+            else if (id == 2)
+            {
+                objSerial3.Transmit(COMMAND_CLOSE + SEPARATOR);
             }
             tl.LogMessage("CloseCover", "Request sent to device!");
         }
